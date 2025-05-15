@@ -4,8 +4,8 @@ document.addEventListener("DOMContentLoaded", function() {
     // ======================
     const menuToggle = document.querySelector('.menu-toggle');
     const navLinks = document.querySelector('.nav-links');
-    const navbar = document.querySelector('.rightnav');
-    
+    const navbar = document.querySelector('.navbar');
+
     if (menuToggle && navLinks) {
         menuToggle.addEventListener('click', () => {
             navLinks.classList.toggle('active');
@@ -14,31 +14,38 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // ======================
-    // Smooth Scroll With Offset
+    // Enhanced Smooth Scroll With Offset
     // ======================
-    document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
+    // Enhanced smooth scroll function
+    function smoothScroll(target) {
+        const targetElement = document.querySelector(target);
+        if (!targetElement) return;
+
+        const navbarHeight = navbar ? navbar.offsetHeight : 0;
+        const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - navbarHeight;
+        
+        window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+        });
+
+        // Close mobile menu if open
+        if (window.innerWidth <= 768 && navLinks && navLinks.classList.contains('active')) {
+            navLinks.classList.remove('active');
+            menuToggle.textContent = '☰';
+        }
+    }
+
+    // Handle all navigation clicks
+    document.querySelectorAll('.navbar a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            
-            if (targetElement) {
-                const navbarHeight = navbar ? navbar.offsetHeight : 0;
-                const offset = navbarHeight + 20;
-
-                window.scrollTo({
-                    top: targetElement.offsetTop - offset,
-                    behavior: 'smooth'
-                });
-
-                // Close mobile menu
-                if (window.innerWidth <= 768 && navLinks.classList.contains('active')) {
-                    navLinks.classList.remove('active');
-                    menuToggle.textContent = '☰';
-                }
+            const target = this.getAttribute('href');
+            if (target !== '#') {
+                smoothScroll(target);
             }
         });
     });
+
 
     // ======================
     // Navbar Scroll Effect
@@ -72,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     const card = entry.target;
                     const index = Array.from(cards).indexOf(card);
                     const direction = index % 2 === 0 ? -1 : 1;
-                    
+
                     if (entry.isIntersecting) {
                         card.style.transform = 'translateX(0)';
                         card.style.opacity = '1';
@@ -96,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const initLogoSlider = () => {
         const logoSlider = document.querySelector('.logo-slider');
         const logoTrack = document.querySelector('.logo-track');
-        
+
         if (logoSlider && logoTrack) {
             logoSlider.addEventListener('mouseenter', () => {
                 logoTrack.style.animationPlayState = 'paused';
